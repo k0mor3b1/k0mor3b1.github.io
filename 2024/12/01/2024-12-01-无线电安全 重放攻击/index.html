@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="环境介绍硬件：  ESP32    ：处理无线通信协议和控制逻辑  CC1101  ：可以发送信号和接收信号  R828D   ：只能接收信号，不能发送  杜邦线   ：母对母*8 软件： URH           ：用于无线电协议的分析、解码和重新播放的开源工具 cc1101-tool ：用于配置和控制 CC1101无线收发芯片的调试工具 gqrx           ：用于无线信号的接收和解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="无线电安全 重放攻击">
+<meta property="og:url" content="http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/index.html">
+<meta property="og:site_name" content="k0mor3b1">
+<meta property="og:description" content="环境介绍硬件：  ESP32    ：处理无线通信协议和控制逻辑  CC1101  ：可以发送信号和接收信号  R828D   ：只能接收信号，不能发送  杜邦线   ：母对母*8 软件： URH           ：用于无线电协议的分析、解码和重新播放的开源工具 cc1101-tool ：用于配置和控制 CC1101无线收发芯片的调试工具 gqrx           ：用于无线信号的接收和解">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/xjXzE3NDAzMDQyNDg6MTc0MDM111">
+<meta property="og:image" content="http://example.com/images/xjXzE3NDAzMDQyNDg6MTc0MDM112">
+<meta property="og:image" content="http://example.com/images/xjXzE3NDAzMDQyNDg6MTc0MDM113">
+<meta property="og:image" content="http://example.com/images/xjXzE3NDAzMDQyNDg6MTc0MDM114">
+<meta property="og:image" content="http://example.com/images/xjXzE3NDAzMDQyNDg6MTc0MDM115">
+<meta property="og:image" content="http://example.com/images/xjXzE3NDAzMDQyNDg6MTc0MDM116">
+<meta property="og:image" content="http://example.com/images/xjXzE3NDAzMDQyNDg6MTc0MDM117">
+<meta property="og:image" content="http://example.com/images/xjXzE3NDAzMDQyNDg6MTc0MDM118">
+<meta property="article:published_time" content="2024-12-01T00:00:00.000Z">
+<meta property="article:modified_time" content="2025-02-23T10:10:42.565Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/xjXzE3NDAzMDQyNDg6MTc0MDM111">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>无线电安全 重放攻击</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/k0mor3b1">Projects</a></li><!--
+     --><!--
+       --><li><a href="/links/">links</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/02/08/2025-02-08-CVE-2025-0282%20Ivanti%20%E6%A0%88%E6%BA%A2%E5%87%BA/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2024/11/23/2024-11-23-CVE-2024-39226%20GL-iNet%20%E8%B7%AF%E7%94%B1%E5%99%A8RCE%E6%BC%8F%E6%B4%9E/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&text=无线电安全 重放攻击"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&title=无线电安全 重放攻击"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&is_video=false&description=无线电安全 重放攻击"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=无线电安全 重放攻击&body=Check out this article: http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&title=无线电安全 重放攻击"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&title=无线电安全 重放攻击"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&title=无线电安全 重放攻击"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&title=无线电安全 重放攻击"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&name=无线电安全 重放攻击&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&t=无线电安全 重放攻击"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">环境介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E6%A0%87"><span class="toc-number">2.</span> <span class="toc-text">目标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#R828D%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">R828D使用教程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ESP32%E8%BF%9E%E6%8E%A5CC1101"><span class="toc-number">4.</span> <span class="toc-text">ESP32连接CC1101</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ESP32%E8%8A%AF%E7%89%87%E7%83%A7%E5%BD%95"><span class="toc-number">5.</span> <span class="toc-text">ESP32芯片烧录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%9A%E8%BF%87ESP32%E5%92%8CCC1101%E5%8F%91%E9%80%81%E6%97%A0%E7%BA%BF%E7%94%B5%E4%BF%A1%E5%8F%B7"><span class="toc-number">6.</span> <span class="toc-text">通过ESP32和CC1101发送无线电信号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">7.</span> <span class="toc-text">总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A1%AC%E4%BB%B6"><span class="toc-number">7.1.</span> <span class="toc-text">硬件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5%EF%BC%9A"><span class="toc-number">8.</span> <span class="toc-text">参考链接：</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        无线电安全 重放攻击
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">John Doe</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-12-01T00:00:00.000Z" class="dt-published" itemprop="datePublished">2024-12-01</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="环境介绍"><a href="#环境介绍" class="headerlink" title="环境介绍"></a>环境介绍</h2><p><strong>硬件：</strong></p>
+<p> <code>ESP32</code>    ：处理无线通信协议和控制逻辑</p>
+<p> <code>CC1101</code>  ：可以发送信号和接收信号</p>
+<p> <code>R828D</code>   ：只能接收信号，不能发送</p>
+<p> 杜邦线   ：母对母<code>*8</code></p>
+<p><strong>软件：</strong></p>
+<p><code>URH</code>           ：用于无线电协议的分析、解码和重新播放的开源工具</p>
+<p><code>cc1101-tool</code> ：用于配置和控制 <code>CC1101</code>无线收发芯片的调试工具</p>
+<p><code>gqrx</code>           ：用于无线信号的接收和解调</p>
+<p><code>Arduino IDE</code> ：用于对<code>ESP32</code>硬件烧录程序</p>
+<p><code>SDRSharp</code>    ：用于信号频率分析</p>
+<p><code>WindTerm</code>    ：用于连接串口</p>
+<h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通过重发包攻击，解锁电动车</span><br></pre></td></tr></table></figure>
+
+<h2 id="R828D使用教程"><a href="#R828D使用教程" class="headerlink" title="R828D使用教程"></a>R828D使用教程</h2><p><strong>Windows</strong></p>
+<p>下载<code>https://zadig.akeo.ie/</code>安装驱动</p>
+<p>使用<code>SDRSharp.exe</code>软件和<code>urh</code>进行监听或分析捕获的信号</p>
+<p>可以先通过<code>SDRSharp.exe</code>分析出目标设备工作的频率，一般在<code>315mhz</code>和<code>433mhz</code>附近，如下图可以看到是在<code>432.720MHz</code>附近</p>
+<p>然后通过<code>urh</code>捕捉信号分析，将信号保存分析</p>
+<p><img src="/images/xjXzE3NDAzMDQyNDg6MTc0MDM111" alt="img"></p>
+<p>三种信号代表三种按钮</p>
+<p><img src="/images/xjXzE3NDAzMDQyNDg6MTc0MDM112" alt="img"></p>
+<p>复制信号进行分析，可以看到三种信号</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1000100011101110111011101110111010001000100011101110111010001000111010001000100010001000100011101</span></span><br><span class="line"><span class="number">1000100011101110111011101110111010001000100011101110111010001000111010001000100010001110100010001</span></span><br><span class="line"><span class="number">1000100011101110111011101110111010001000100011101110111010001000111010001000100010001000111010001</span></span><br></pre></td></tr></table></figure>
+
+<p>对信号进行转换<code>1000 -&gt; 0</code>，<code>1110 -&gt; 1</code>，可以看到只有后四位不同，最后的<code>1</code>是<code>SYN</code>码</p>
+<p><img src="/images/xjXzE3NDAzMDQyNDg6MTc0MDM113" alt="img"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0011111100011100100000011</span><br><span class="line">0011111100011100100001001</span><br><span class="line">0011111100011100100000101</span><br></pre></td></tr></table></figure>
+
+<p>通过<code>urh</code>工具也可以看到</p>
+<p><img src="/images/xjXzE3NDAzMDQyNDg6MTc0MDM114" alt="img"></p>
+<p><strong>Linux</strong></p>
+<p>安装驱动，安装<code>urh</code>，安装<code>gqrx</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update </span><br><span class="line">sudo pipx install urh</span><br><span class="line">在~/.bashrc文件中，最后一行添加export PATH=<span class="string">&quot;$PATH:/root/.local/bin&quot;</span>保存</span><br><span class="line">source ~/.bashrc</span><br><span class="line"></span><br><span class="line">apt install gqrx-sdr</span><br></pre></td></tr></table></figure>
+
+<p><code>R828D</code>连接到虚拟机，结合<code>urh</code>捕捉信号分析</p>
+<h2 id="ESP32连接CC1101"><a href="#ESP32连接CC1101" class="headerlink" title="ESP32连接CC1101"></a>ESP32连接CC1101</h2><p><code>E07-M1101D</code>引脚<code>ESP32</code>引脚描述<code>GNDGND</code>地线连接，确保模块和<code>ESP32</code>共地<code>VDD3.3V</code>电源连接，使用<code>ESP32</code>的<code>3.3V</code>输出<code>GDO0GPIO4</code>（可选）用于中断信号检测<code>CSNGPIO5SPI</code>的片选信号<code>SCKGPIO18SPI</code>的时钟信号<code>MOSIGPIO23SPI</code>的主机数据输出信号<code>MISO/GDO1GPIO19SPI</code>的主机数据输入信号<code>GDO2GPIO16</code>（可选）用于其他功能（如状态指示等）</p>
+<h2 id="ESP32芯片烧录"><a href="#ESP32芯片烧录" class="headerlink" title="ESP32芯片烧录"></a>ESP32芯片烧录</h2><p>前期准备</p>
+<p>在<code>cc1101-tool</code>中下载<code>cc1101-tool-esp32-wroom.ino</code>，安装<code>Arduino IDE</code>，将<code>ESP32</code>连接到电脑，安装<a target="_blank" rel="noopener" href="https://www.silabs.com/developer-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads">驱动</a>，</p>
+<p>使用<code>Arduino IDE</code>打开<code>cc1101-tool-esp32-wroom.ino</code>，<code>Arduino IDE</code>-&gt;工具-&gt;开发板-&gt;开发板管理器-&gt;搜索<code>Espressif Systems</code>和<code>ELECHOUSE_CC1101</code>安装，然后选择开发板</p>
+<p><img src="/images/xjXzE3NDAzMDQyNDg6MTc0MDM115" alt="img"></p>
+<p>点击上传按钮，观察输出窗口</p>
+<p><img src="/images/xjXzE3NDAzMDQyNDg6MTc0MDM116" alt="img"></p>
+<h2 id="通过ESP32和CC1101发送无线电信号"><a href="#通过ESP32和CC1101发送无线电信号" class="headerlink" title="通过ESP32和CC1101发送无线电信号"></a>通过ESP32和CC1101发送无线电信号</h2><p>使用工具连接串口</p>
+<p><img src="/images/xjXzE3NDAzMDQyNDg6MTc0MDM117" alt="img"></p>
+<p><img src="/images/xjXzE3NDAzMDQyNDg6MTc0MDM118" alt="img"></p>
+<p>输入<code>help</code>可以查看指令集</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">show : Show content of recording buffer</span><br><span class="line">flush : Clear the recording buffer</span><br><span class="line">recraw &lt;microseconds&gt; : Recording RAW RF data <span class="keyword">with</span> &lt;microsecond&gt; sampling interval.</span><br><span class="line">addraw &lt;<span class="built_in">hex</span>-vals&gt; : Manually add chunks (<span class="built_in">max</span> <span class="number">60</span> <span class="built_in">hex</span> values) to the buffer so they can be further replayed.</span><br><span class="line">showraw : Showing content of recording buffer <span class="keyword">in</span> RAW <span class="built_in">format</span>.</span><br><span class="line">playraw &lt;microseconds&gt; : Replaying previously recorded RAW RF data <span class="keyword">with</span> &lt;microsecond&gt; sampling interval.</span><br></pre></td></tr></table></figure>
+
+<p>方式一：</p>
+<p><code>recraw &lt;microseconds&gt;</code>监听指定间隔毫米的无线电信号</p>
+<p><code>playraw &lt;microseconds&gt;</code>发送指定间隔毫米的无线电信号</p>
+<p>方式二：</p>
+<p><code>addraw &lt;hex-vals&gt;</code>向缓冲区写无线电信号</p>
+<p><code>playraw &lt;microseconds&gt;</code>发送指定间隔毫米的无线电信号</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="硬件"><a href="#硬件" class="headerlink" title="硬件"></a>硬件</h3><p><strong>ESP32</strong></p>
+<p> <strong>双核处理器</strong></p>
+<ul>
+<li>ESP32 内置 <strong>Tensilica Xtensa LX6 双核处理器</strong>，每个核心的最高频率可达 <strong>240</strong> <strong>MHz</strong>，拥有高达 <strong>600</strong> <strong>DMIPS</strong> 的计算能力，能够处理复杂的计算任务。</li>
+<li>也有单核版本的 ESP32（例如 ESP32-S0WD）用于更加低功耗的应用场景。</li>
+</ul>
+<p> <strong>Wi-Fi 和蓝牙双模通信</strong></p>
+<ul>
+<li><strong>Wi-Fi</strong>：支持 IEEE 802.11 b&#x2F;g&#x2F;n 协议，能够在 <strong>2.4 GHz</strong> 频段进行通信，具备 AP（接入点）、STA（站点）和 Mesh（自组网）模式，适合组建无线网络。</li>
+<li><strong>蓝牙</strong>：支持 Bluetooth 4.2 BR&#x2F;EDR 和 BLE（Bluetooth Low Energy），适合短距离通信或蓝牙配件集成。支持蓝牙双模通信，可以在不消耗太多电量的情况下实现与蓝牙设备的互通。</li>
+<li>Wi-Fi 和蓝牙可以同时使用，这使得 ESP32 适用于连接各种无线设备。</li>
+</ul>
+<p> <strong>低功耗设计</strong></p>
+<ul>
+<li>ESP32 设计有多种低功耗模式，包括 <strong>深度睡眠****模式</strong> 和 <strong>休眠模式</strong>，能够将功耗降至微安级，非常适合电池供电的设备。</li>
+<li>支持 ULP（超低功耗协处理器），在低功耗模式下可以处理简单任务，无需唤醒主 CPU，从而进一步降低功耗。</li>
+</ul>
+<p><strong>丰富的</strong> <strong>I&#x2F;O</strong> <strong>接口</strong></p>
+<ul>
+<li>提供了丰富的外设接口，包括 <strong>GPIO</strong>、<strong>ADC</strong>（12 位）、<strong>DAC</strong>、<strong>SPI</strong>、<strong>I2C</strong>、<strong>UART</strong>、<strong>PWM</strong> 等，适配多种传感器和执行器。</li>
+<li>支持 <strong>触摸传感接口</strong> 和 <strong>温度传感器</strong>，可以直接用于触摸和温度感知场景。</li>
+<li>集成了 CAN 总线接口，便于在工业控制领域中应用。</li>
+</ul>
+<p> <strong>大容量存储</strong></p>
+<ul>
+<li>集成 <strong>520</strong> <strong>KB</strong> <strong>的</strong> <strong>SRAM</strong> 和 <strong>448 KB</strong> <strong>ROM</strong>，可用于存储程序和数据。</li>
+<li>支持 <strong>外部 Flash 存储</strong>，容量通常为 <strong>4</strong> <strong>MB</strong> 或更大，能够满足大规模应用的需求。</li>
+</ul>
+<p> <strong>硬件加密功能</strong></p>
+<ul>
+<li>ESP32 支持多种硬件加密算法，包括 <strong>AES</strong>、<strong>SHA</strong>、<strong>RSA</strong> 等，适用于实现安全的网络通信。</li>
+<li>内置安全启动和闪存加密机制，能够保护设备的固件和数据安全。</li>
+</ul>
+<p><strong>集成的</strong> <strong>RTOS</strong> <strong>支持</strong></p>
+<ul>
+<li>ESP32 自带 <strong>FreeRTOS</strong> 实时操作系统，支持多任务调度和系统资源管理。</li>
+<li>多任务支持便于用户开发复杂应用，例如同时处理传感器数据、网络通信、数据处理等多种任务。</li>
+</ul>
+<p> <strong>开发环境支持</strong></p>
+<ul>
+<li>ESP32 可以在多种开发环境中进行编程，包括 <strong>Arduino</strong> <strong>IDE</strong>、**Espressif’s IDF（**<strong>IoT</strong> <strong>Development Framework）</strong>、<strong>MicroPython</strong> 等，适合不同层次的开发者。</li>
+<li>官方提供的 Espressif IoT Development Framework (ESP-IDF) 是一个强大的开发工具包，支持 OTA（空中升级）和大量的开源库。</li>
+</ul>
+<p> 引脚图</p>
+<p><strong>CC1101</strong></p>
+<p> CC1101 支持多种频率频段，尤其适用于 <strong>315</strong> <strong>MHz</strong>、<strong>433 MHz</strong>、<strong>868 MHz</strong> 和 <strong>915 MHz</strong> 的 ISM 频段</p>
+<p> CC1101 支持多种调制方式，包括 **2-**<strong>FSK</strong>（二进制频移键控）、<strong>GFSK</strong>（高斯频移键控）、<strong>OOK</strong>（开关键控）和 <strong>MSK</strong>（最小频移键控）</p>
+<p> CC1101 数据速率范围从 <strong>0.6</strong> <strong>kbps</strong> <strong>到 500 kbps</strong>，可通过寄存器配置来调节数据传输速度</p>
+<p> CC1101 具有出色的接收灵敏度，可以达到 <strong>-120</strong> <strong>dBm</strong> 左右，能够接收微弱的信号，从而提升通信距离</p>
+<p> CC1101 使用标准的 <strong>SPI</strong><strong>（<strong><strong>串行外设接口</strong></strong>）</strong> 与外部主控芯片（如单片机、ESP32 等）进行通信，SPI 接口的数据传输速率可达 <strong>10 Mbps</strong></p>
+<p> CC1101 具有自动频率校准功能，能够在频率偏移较大的情况下自动对频率进行校正，以提高接收信号的准确性</p>
+<p> CC1101 通过配置寄存器控制芯片的工作状态和参数。常见的工作模式包括：</p>
+<ul>
+<li>**待机模式（**<strong>Idle</strong> <strong>Mode）</strong>：低功耗模式，快速响应模式切换。</li>
+<li><strong>接收模式（RX Mode）</strong>：进入接收状态，等待接收数据。</li>
+<li><strong>发送模式（TX Mode）</strong>：发射状态，将 FIFO 中的数据发射出去。</li>
+<li><strong>睡眠模式（Sleep Mode）</strong>：超低功耗模式，用于节能。</li>
+</ul>
+<p> 引脚图（这里在淘宝买的CC1101，但快递到了之后显示是E07-M1101D）</p>
+<p><strong>R828D</strong></p>
+<p> R828D 的频率覆盖范围广，通常支持 <strong>42 MHz 到 1002 MHz</strong> 之间的频段，可覆盖大量的无线电频率，如 FM 广播、VHF&#x2F;UHF 电视信号、气象卫星信号等</p>
+<p> R828D 内置低噪声放大器，可在接收微弱信号时进行放大，同时将噪声控制在较低水平，确保接收信号的质量</p>
+<p> R828D 支持 <strong>自动增益控制（AGC）</strong> 功能，可以根据接收信号的强度自动调整增益，避免强信号过载导致的失真</p>
+<p> R828D 采用宽带调谐器设计，支持多种调制方式，如 AM、FM、QAM 等，适配不同的无线电协议</p>
+<p> R828D 的工作模式</p>
+<ul>
+<li><strong>低功耗接收模式</strong>：在维持较高的接收灵敏度的同时，将功耗控制在最低，以延长设备的使用寿命。</li>
+<li><strong>自动增益调节模式</strong>：根据接收信号的变化自动调节增益，适应不同信号源的需求。</li>
+<li><strong>数字调谐模式</strong>：支持多频段调谐和信号调制格式的解码，用于不同的无线协议接收。</li>
+</ul>
+<h2 id="参考链接："><a href="#参考链接：" class="headerlink" title="参考链接："></a>参考链接：</h2><p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/av887144512?vd_source=2ebfc962819c00c32934bd94fff93ea4&spm_id_from=333.788.player.switch">https://www.bilibili.com/video/av887144512?vd_source=2ebfc962819c00c32934bd94fff93ea4&amp;spm_id_from=333.788.player.switch</a></p>
+<p><a target="_blank" rel="noopener" href="https://lanvnal.com/2019/01/22/yi-ci-dui-dian-dong-che-yao-chi-de-xin-hao-fen-xi/">https://lanvnal.com/2019/01/22/yi-ci-dui-dian-dong-che-yao-chi-de-xin-hao-fen-xi/</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV11YULYjEfy/?spm_id_from=333.337.search-card.all.click&vd_source=2ebfc962819c00c32934bd94fff93ea4">https://www.bilibili.com/video/BV11YULYjEfy/?spm_id_from=333.337.search-card.all.click&amp;vd_source=2ebfc962819c00c32934bd94fff93ea4</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/k1two2/p/5436099.html">https://www.cnblogs.com/k1two2/p/5436099.html</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/k0mor3b1">Projects</a></li>
+        
+          <li><a href="/links/">links</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">环境介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E6%A0%87"><span class="toc-number">2.</span> <span class="toc-text">目标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#R828D%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">R828D使用教程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ESP32%E8%BF%9E%E6%8E%A5CC1101"><span class="toc-number">4.</span> <span class="toc-text">ESP32连接CC1101</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ESP32%E8%8A%AF%E7%89%87%E7%83%A7%E5%BD%95"><span class="toc-number">5.</span> <span class="toc-text">ESP32芯片烧录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%9A%E8%BF%87ESP32%E5%92%8CCC1101%E5%8F%91%E9%80%81%E6%97%A0%E7%BA%BF%E7%94%B5%E4%BF%A1%E5%8F%B7"><span class="toc-number">6.</span> <span class="toc-text">通过ESP32和CC1101发送无线电信号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">7.</span> <span class="toc-text">总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A1%AC%E4%BB%B6"><span class="toc-number">7.1.</span> <span class="toc-text">硬件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5%EF%BC%9A"><span class="toc-number">8.</span> <span class="toc-text">参考链接：</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&text=无线电安全 重放攻击"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&title=无线电安全 重放攻击"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&is_video=false&description=无线电安全 重放攻击"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=无线电安全 重放攻击&body=Check out this article: http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&title=无线电安全 重放攻击"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&title=无线电安全 重放攻击"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&title=无线电安全 重放攻击"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&title=无线电安全 重放攻击"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&name=无线电安全 重放攻击&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/12/01/2024-12-01-%E6%97%A0%E7%BA%BF%E7%94%B5%E5%AE%89%E5%85%A8%20%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/&t=无线电安全 重放攻击"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    John Doe
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/k0mor3b1">Projects</a></li><!--
+     --><!--
+       --><li><a href="/links/">links</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
